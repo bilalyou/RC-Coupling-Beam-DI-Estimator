@@ -1,11 +1,10 @@
 streamlit
 pandas
 numpy
-xgboost
+xgboost==1.7.6
 catboost
 lightgbm
 joblib
 tensorflow
 scikit-learn
 matplotlib
-
