@@ -29,7 +29,7 @@ The app integrates several optimized ML models and a practical equation-based so
 
 Access the web app here:
 
-> **Streamlit app:** _([add your Streamlit URL here](https://rc-coupling-beam-di-estimator.streamlit.app/))_
+> **Streamlit app:** _((https://rc-coupling-beam-di-estimator.streamlit.app/)_
 
 ---
 
