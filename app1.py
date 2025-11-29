@@ -267,6 +267,9 @@ with col2:
             input_norm = normalize_input(input_array, ann_mlp_scaler_X)
             pred_scaled = model.predict(input_norm)[0][0]
             pred = denormalize_output(pred_scaled, ann_mlp_scaler_y)
+        elif model_choice == "Extra Trees":
+           # <<< use raw numpy array to avoid feature-name mismatch
+           pred = model.predict(input_array)[0]
         else:
             # CatBoost, XGBoost, Extra Trees
             pred = model.predict(input_df)[0]
@@ -367,3 +370,4 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
