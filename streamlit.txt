@@ -1,10 +1,13 @@
 streamlit
-pandas
-numpy
+pandas==1.5.3
+numpy==1.24.0
 xgboost==1.7.6
 catboost
 lightgbm
-joblib
 tensorflow
-scikit-learn
-matplotlib
+joblib==1.5.0
+scikit-learn==1.3.2
+
+# Optional helpers (safe to keep)
+pyarrow
+skops==0.9.0
