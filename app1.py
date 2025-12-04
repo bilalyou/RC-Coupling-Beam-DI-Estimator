@@ -163,7 +163,7 @@ with col1:
 
     st.markdown(
         "<p style='text-align: center;'>"
-        "This online app estimates the Park-Ang damage index of RC coupling beams."
+        "This online app estimates the Park-Ang damage index of RC coupling beams"
         "by providing only the relevant input parameters."
         "</p>",
         unsafe_allow_html=True
@@ -370,5 +370,6 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
 
 
