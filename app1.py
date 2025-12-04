@@ -302,7 +302,7 @@ with col2:
             state_color = "gray"
 
         # -------- Plot: Drift vs Damage Index --------
-        fig, ax = plt.subplots(figsize=(3, 2))   # compact plot to fit space
+        fig, ax = plt.subplots(figsize=(2, 1))   # compact plot to fit space
 
         # fixed axis ranges
         x_max = 12.20          # covers full drift range (0–12.22%)
@@ -370,6 +370,7 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
