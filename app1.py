@@ -216,7 +216,7 @@ with col1:
 
 # ----------------------------- COLUMN 2 -------------------------------
 with col2:
-    st.image("Final 3D coupling beams for GUI-01.svg", width=550)
+    st.image("Final 3D coupling beams for GUI-01.svg", width=500)
     st.markdown(
         "<div style='text-align:center; font-weight:800; font-size:18px;'>"
         "RC Coupling Beam Configurations</div>",
@@ -370,6 +370,7 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
