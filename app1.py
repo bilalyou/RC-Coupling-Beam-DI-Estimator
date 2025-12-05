@@ -153,7 +153,7 @@ with col1:
         st.markdown(
             f"""
             <div style='text-align: center; margin-top: 10px;'>
-                <img src='data:image/png;base64,{base64_logo}' width='500'>
+                <img src='data:image/png;base64,{base64_logo}' width='600'>
             </div>
             """,
             unsafe_allow_html=True
@@ -302,7 +302,7 @@ with col2:
             state_color = "gray"
 
         # -------- Plot: Drift vs Damage Index --------
-        fig, ax = plt.subplots(figsize=(3, 2))   # compact plot to fit space
+        fig, ax = plt.subplots(figsize=(3, 1.9))   # compact plot to fit space
 
         # fixed axis ranges
         x_max = 12.20          # covers full drift range (0–12.22%)
@@ -370,6 +370,7 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
