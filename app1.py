@@ -236,7 +236,7 @@ with col2:
     # Right side remains independent (no forced background now)
 
     # Read the SVG as bytes and convert to base64
-    with open("beam-01.svg", "rb") as f:
+    with open("beam-011.svg", "rb") as f:
         svg_bytes = f.read()
     svg_base64 = base64.b64encode(svg_bytes).decode("utf-8")
 
@@ -440,3 +440,4 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
