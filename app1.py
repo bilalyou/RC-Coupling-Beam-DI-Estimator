@@ -14,6 +14,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import io
+
 # ======================================================================
 # PAGE CONFIG + CSS
 # ======================================================================
@@ -30,7 +31,7 @@ st.markdown(r"""
         font-size: 50px !important;
         font-weight: 1000;
     }
-    
+
     .section-header {
         font-size: 26px;
         font-weight: 700;
@@ -80,24 +81,25 @@ st.markdown(r"""
     }
 
     /* ===== MAIN 2-COLUMN ROW ONLY (col1 background) ===== */
-div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(2))
-  > div[data-testid="column"]:first-child
-  > div {
-    background-color: powderblue;
-    border-radius: 16px;
-    padding: 20px 20px;
-    border: 1px solid white;
-}
+    /* Deploy-safe: no :has(). We mark the row in Python and select the next stHorizontalBlock. */
+    div#main-two-cols + div[data-testid="stHorizontalBlock"]
+      > div[data-testid="column"]:first-child
+      > div {
+        background-color: powderblue;
+        border-radius: 16px;
+        padding: 20px 20px;
+        border: 1px solid white;
+    }
 
-/* ===== CANCEL the background for any nested columns (buttons etc.) ===== */
-div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] 
-  > div[data-testid="column"] > div {
-    background-color: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-}
-
-
+    /* ===== CANCEL the background for any nested columns (buttons etc.) ===== */
+    div#main-two-cols + div[data-testid="stHorizontalBlock"]
+      > div[data-testid="column"]:first-child
+      div[data-testid="stHorizontalBlock"]
+      > div[data-testid="column"] > div {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
 
     /* (Optional) If you want right side untouched, do nothing.
        If you ever want same style on right too, create .right-panel similarly. */
@@ -154,6 +156,9 @@ if "results_df" not in st.session_state:
 # ======================================================================
 # MAIN TWO-COLUMN LAYOUT
 # ======================================================================
+# ✅ Marker for deploy-safe CSS targeting (does NOT change layout)
+st.markdown('<div id="main-two-cols"></div>', unsafe_allow_html=True)
+
 col1, col2 = st.columns([2, 1.2], gap="large")
 
 # ----------------------------- COLUMN 1 -------------------------------
@@ -315,13 +320,13 @@ with col2:
 
         y_max = 1.5
         drift_safe = max(float(drift), 1e-6)
-        pad = 0.1 * drift_safe
+        pad = 0.08 * drift_safe
         x_max = drift_safe + pad
 
         ax.axhspan(0.0, 0.2, facecolor="green",  alpha=0.4, zorder=0)
         ax.axhspan(0.2, 0.5, facecolor="orange", alpha=0.4, zorder=0)
         ax.axhspan(0.5, 1.0, facecolor="red",    alpha=0.4, zorder=0)
-        ax.axhspan(1.0, y_max, facecolor="gray", alpha=0.8, zorder=0)
+        ax.axhspan(1.0, y_max, facecolor="gray", alpha=0.6, zorder=0)
 
         theta_vals = np.linspace(0.0, drift_safe, 80)
         di_vals = (pred / drift_safe) * theta_vals
@@ -350,8 +355,7 @@ with col2:
         )
 
         ax.scatter(
-            [drift_safe],
-            [pred],
+            [drift_safe], [pred],
             s=30,
             facecolors="none",
             edgecolors="black",
@@ -359,39 +363,16 @@ with col2:
             zorder=6
         )
 
-        # ---- projection lines to axes ----
-        ax.vlines(
-            x=drift_safe,
-            ymin=0.0,
-            ymax=pred,
-            colors="black",
-            linestyles="dashed",
-            linewidth=0.7,
-            zorder=4
-        )
-
-        ax.hlines(
-            y=pred,
-            xmin=0.0,
-            xmax=drift_safe,
-            colors="black",
-            linestyles="dashed",
-            linewidth=0.7,
-            zorder=4
-        )
-
         ax.text(
             drift_safe,
             pred + 0.06,
             f"{pred:.2f}",
-            ha="center",
-            va="bottom",
+            ha="center", va="bottom",
             fontsize=8,
             color="black",
             fontweight="bold",
             zorder=7
         )
-
 
         ax.text(1.04, 0.10 / y_max, "ND",  transform=ax.transAxes,
                 fontsize=8, color="green", fontweight="bold",
@@ -406,23 +387,9 @@ with col2:
                 fontsize=8, color="gray", fontweight="bold",
                 va="center", ha="left")
 
-        ax.spines["top"].set_visible(True)
-        ax.spines["right"].set_visible(True)
-        
-        ax.spines ["top"].set_linewidth(0.5)
-        ax.spines ["right"].set_linewidth(0.5)
-        ax.spines ["left"].set_linewidth(0.5)
-        ax.spines ["bottom"].set_linewidth(0.5)
-        
-        ax.tick_params(
-    axis="both",
-    which="major",
-    labelsize=5,
-    length=3,
-    width=0.5,
-    direction="out"
-)
-        
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.tick_params(labelsize=5)
         ax.grid(True, linestyle="", linewidth=0.5, alpha=0.6)
 
         plt.tight_layout(pad=0.4)
@@ -437,9 +404,3 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
-
