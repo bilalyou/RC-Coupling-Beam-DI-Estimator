@@ -80,26 +80,26 @@ st.markdown(r"""
         background-color: #27ae60;
     }
 
-    /* ===== MAIN 2-COLUMN ROW ONLY (col1 background) ===== */
-    /* Deploy-safe: no :has(). We mark the row in Python and select the next stHorizontalBlock. */
-    div#main-two-cols + div[data-testid="stHorizontalBlock"]
-      > div[data-testid="column"]:first-child
-      > div {
-        background-color: powderblue;
-        border-radius: 16px;
-        padding: 20px 20px;
-        border: 1px solid white;
-    }
+   /* ===== LEFT MAIN COLUMN BACKGROUND (DEPLOY SAFE) ===== */
+/* Apply background to the first column of ANY horizontal block */
+div[data-testid="stHorizontalBlock"]
+  > div[data-testid="column"]:first-child
+  > div {
+    background-color: powderblue;
+    border-radius: 16px;
+    padding: 20px 20px;
+    border: 1px solid white;
+}
 
-    /* ===== CANCEL the background for any nested columns (buttons etc.) ===== */
-    div#main-two-cols + div[data-testid="stHorizontalBlock"]
-      > div[data-testid="column"]:first-child
-      div[data-testid="stHorizontalBlock"]
-      > div[data-testid="column"] > div {
-        background-color: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-    }
+/* ===== CANCEL background for nested columns (c1,c2,c3, buttons, etc.) ===== */
+/* Any horizontal block inside another horizontal block should NOT inherit background */
+div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]
+  > div[data-testid="column"] > div {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
 
     /* (Optional) If you want right side untouched, do nothing.
        If you ever want same style on right too, create .right-panel similarly. */
@@ -404,3 +404,4 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
