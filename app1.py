@@ -184,7 +184,7 @@ with col1:
         unsafe_allow_html=True
     )
 
-    st.markdown("<div class='form-banner'>Inputs</div>", unsafe_allow_html=True)
+    st.markdown("<div class='form-banner'>Input parameters</div>", unsafe_allow_html=True)
     st.session_state.input_error = False
 
     c1, c2, c3 = st.columns(3)
@@ -437,4 +437,5 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
+
 
