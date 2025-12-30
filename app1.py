@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 26 19:03:21 2025
-
-@author: youni
-"""
-
 # ======================================================================
 # IMPORTS
 # ======================================================================
@@ -18,40 +11,42 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import base64
 from pathlib import Path
-import matplotlib.pyplot as plt   # <<< ADDED for plotting
-
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+import io
 # ======================================================================
 # PAGE CONFIG + CSS
 # ======================================================================
 st.set_page_config(page_title="PADI Prediction", layout="wide", page_icon="")
 
-# --- Custom CSS for Styling ---
 st.markdown(r"""
 <style>
-    .block-container { padding-top: 2rem; }
+    .block-container { padding-top: 3rem; }
+
     .stNumberInput > div > div, .stSelectbox > div > div {
         max-width: 240px !important;
     }
     .stNumberInput label, .stSelectbox label {
-        font-size: 40px !important;
+        font-size: 50px !important;
         font-weight: 1000;
     }
+    
     .section-header {
         font-size: 26px;
         font-weight: 700;
         margin-bottom: 0.8rem;
     }
-    .form-banner {         
+    .form-banner {
         text-align: center;
-        background: linear-gradient(lightgray);
+        background: linear-gradient(powderblue);
         padding: 0.4rem;
-        font-size: 30px;
+        font-size: 50px;
         font-weight: 800;
         color: black;
         border-radius: 0px;
         margin: 0rem 0;
     }
-    .prediction-result { 
+    .prediction-result {
         font-size: 25px;
         font-weight: bold;
         color: black;
@@ -69,26 +64,43 @@ st.markdown(r"""
         border-left: 4px solid #4CAF50;
         font-weight: 600;
     }
+
+    /* Buttons (keep your look) */
     div.stButton > button {
-        background-color: #2ecc71;
+        background-color: powderblue;
         color: black;
         font-weight: bold;
         font-size: 20px;
-        border-radius: 0px;
+        border-radius: 5px;
         padding: 0rem 3.0rem;
         border: none;
     }
     div.stButton > button:hover {
         background-color: #27ae60;
     }
-    div.stButton:nth-of-type(3) > button {
-        background-color: #f28b82 !important;
-        color: white !important;
-        font-weight: bold !important;
-    }
-    div.stButton:nth-of-type(3) > button:hover {
-        background-color: #e06666 !important;
-    }
+
+    /* ===== MAIN 2-COLUMN ROW ONLY (col1 background) ===== */
+div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(2))
+  > div[data-testid="column"]:first-child
+  > div {
+    background-color: powderblue;
+    border-radius: 16px;
+    padding: 20px 20px;
+    border: 1px solid white;
+}
+
+/* ===== CANCEL the background for any nested columns (buttons etc.) ===== */
+div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] 
+  > div[data-testid="column"] > div {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+
+
+    /* (Optional) If you want right side untouched, do nothing.
+       If you ever want same style on right too, create .right-panel similarly. */
 </style>
 """, unsafe_allow_html=True)
 
@@ -142,10 +154,13 @@ if "results_df" not in st.session_state:
 # ======================================================================
 # MAIN TWO-COLUMN LAYOUT
 # ======================================================================
-col1, col2 = st.columns([2.2, 1.5], gap="large")
+col1, col2 = st.columns([2, 1.2], gap="large")
 
 # ----------------------------- COLUMN 1 -------------------------------
 with col1:
+    # ✅ Only LEFT side gets background (no more global column styling)
+    st.markdown("<div class='left-panel'>", unsafe_allow_html=True)
+
     logo_path = Path("logo2-01.png")
     if logo_path.exists():
         with open(logo_path, "rb") as f:
@@ -153,7 +168,7 @@ with col1:
         st.markdown(
             f"""
             <div style='text-align: center; margin-top: 10px;'>
-                <img src='data:image/png;base64,{base64_logo}' width='600'>
+                <img src='data:image/png;base64,{base64_logo}' width='550'>
             </div>
             """,
             unsafe_allow_html=True
@@ -163,16 +178,13 @@ with col1:
 
     st.markdown(
         "<p style='text-align: center;'>"
-        "This online app estimates the Park-Ang damage index of RC coupling beams "
+        "This online app estimate the Park-Ang damage index of RC coupling beams "
         "by providing only the relevant input parameters."
         "</p>",
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        "<div class='form-banner'>Input Parameters</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("<div class='form-banner'>Input Parameters</div>", unsafe_allow_html=True)
     st.session_state.input_error = False
 
     c1, c2, c3 = st.columns(3)
@@ -180,11 +192,11 @@ with col1:
     with c1:
         st.markdown("<div class='section-header'></div>", unsafe_allow_html=True)
         L = st.number_input("Beam Length $l$ (mm)", value=1000.0,
-                            min_value=424.0, max_value=2235.0, step=1.0)
+                            min_value=400.0, max_value=2200.0, step=1.0)
         h = st.number_input("Beam Height $h$ (mm)", value=400.0,
-                            min_value=169.0, max_value=880.0, step=1.0)
+                            min_value=200.0, max_value=800.0, step=1.0)
         b = st.number_input("Beam Width $b$ (mm)", value=200.0,
-                            min_value=100.0, max_value=406.0, step=1.0)
+                            min_value=150.0, max_value=400.0, step=1.0)
         AR = st.number_input("Aspect Ratio $l/h$", value=2.5,
                              min_value=0.75, max_value=4.9, step=0.01)
         fc = st.number_input("Concrete Strength $f'_c$ (MPa)", value=54.0,
@@ -211,12 +223,28 @@ with col1:
                              value=1.005, min_value=0.0, max_value=5.8, step=0.01)
         alpha = st.number_input("Diagonal Angle $\\alpha$", value=17.5,
                                 min_value=0.0, max_value=45.0, step=1.0)
-        drift = st.number_input("$\\theta$ (%)", value=1.5,
+        drift = st.number_input("Chord Rotation $\\theta$ (%)", value=1.5,
                                 min_value=0.06, max_value=12.22, step=0.1)
+
+    st.markdown("</div>", unsafe_allow_html=True)  # ✅ close left-panel
+
 
 # ----------------------------- COLUMN 2 -------------------------------
 with col2:
-    st.image("Final 3D coupling beams for GUI-01.svg", width=500)
+    # Right side remains independent (no forced background now)
+
+    # Read the SVG as bytes and convert to base64
+    with open("beam-01.svg", "rb") as f:
+        svg_bytes = f.read()
+    svg_base64 = base64.b64encode(svg_bytes).decode("utf-8")
+
+    img_html = f"""
+    <div style='text-align:center;'>
+        <img src="data:image/svg+xml;base64,{svg_base64}" width="700">
+    </div>
+    """
+    st.markdown(img_html, unsafe_allow_html=True)
+
     st.markdown(
         "<div style='text-align:center; font-weight:800; font-size:18px;'>"
         "RC Coupling Beam Configurations</div>",
@@ -244,7 +272,6 @@ with col2:
 
     # ==================== PREDICTION LOGIC (with plot) ====================
     if submit and not st.session_state.input_error:
-        # include drift as last feature
         input_array = np.array(
             [[L, h, b, AR, fc, fyl, fyv, Pl, Pv, s, Pd, fyd, alpha, drift]]
         )
@@ -268,10 +295,8 @@ with col2:
             pred_scaled = model.predict(input_norm)[0][0]
             pred = denormalize_output(pred_scaled, ann_mlp_scaler_y)
         elif model_choice == "Extra Trees":
-           # <<< use raw numpy array to avoid feature-name mismatch
-           pred = model.predict(input_array)[0]
+            pred = model.predict(input_array)[0]
         else:
-            # CatBoost, XGBoost, Extra Trees
             pred = model.predict(input_df)[0]
 
         input_df["Predicted_PADI"] = pred
@@ -280,86 +305,129 @@ with col2:
             ignore_index=True
         )
 
-        # numeric prediction text
-        st.markdown(
-            f"<div class='prediction-result'>"
-            f"Predicted Damage Index : {pred:.2f} </div>",
-            unsafe_allow_html=True
+        # ==================================================================
+        # PLOT (your same plot logic)
+        # ==================================================================
+        fig, ax = plt.subplots(figsize=(2.3, 1.6))
+
+        fig.patch.set_alpha(0)
+        ax.set_facecolor("none")
+
+        y_max = 1.5
+        drift_safe = max(float(drift), 1e-6)
+        pad = 0.1 * drift_safe
+        x_max = drift_safe + pad
+
+        ax.axhspan(0.0, 0.2, facecolor="green",  alpha=0.4, zorder=0)
+        ax.axhspan(0.2, 0.5, facecolor="orange", alpha=0.4, zorder=0)
+        ax.axhspan(0.5, 1.0, facecolor="red",    alpha=0.4, zorder=0)
+        ax.axhspan(1.0, y_max, facecolor="gray", alpha=0.8, zorder=0)
+
+        theta_vals = np.linspace(0.0, drift_safe, 80)
+        di_vals = (pred / drift_safe) * theta_vals
+        ax.plot(theta_vals, di_vals, linewidth=1, color="black", zorder=3)
+
+        ax.set_xlim(0.0, x_max)
+        ax.set_ylim(0.0, y_max)
+        ax.set_xlabel("$\\theta$ (%)", fontsize=8)
+        ax.set_ylabel("Damage Index", fontsize=8)
+        ax.set_yticks(np.linspace(0.0, y_max, 6))
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
+        
+
+        xticks = ax.get_xticks()
+        xticks = xticks[(xticks >= 0.0) & (xticks <= drift_safe)]
+        di_ticks = (pred / drift_safe) * xticks
+
+        ax.plot(
+            xticks, di_ticks,
+            linestyle="None",
+            marker="o",
+            markersize=4,
+            markerfacecolor="none",
+            markeredgecolor="black",
+            markeredgewidth=0.7,
+            zorder=5
         )
 
-        # -------- Damage state classification --------
-        if pred < 0.2:
-            damage_state = "No damage"
-            state_color = "green"
-        elif pred < 0.5:
-            damage_state = "Partial damage"
-            state_color = "orange"
-        elif pred <= 1.0:
-            damage_state = "Severe damage"
-            state_color = "red"
-        else:
-            damage_state = "Collapse"
-            state_color = "gray"
+        ax.scatter(
+            [drift_safe],
+            [pred],
+            s=30,
+            facecolors="none",
+            edgecolors="black",
+            linewidths=0.9,
+            zorder=6
+        )
 
-        # -------- Plot: Drift vs Damage Index --------
-        fig, ax = plt.subplots(figsize=(3, 1.9))   # compact plot to fit space
+        # ---- projection lines to axes ----
+        ax.vlines(
+            x=drift_safe,
+            ymin=0.0,
+            ymax=pred,
+            colors="black",
+            linestyles="dashed",
+            linewidth=0.7,
+            zorder=4
+        )
 
-        # fixed axis ranges
-        x_max = 12.20          # covers full drift range (0–12.22%)
-        y_max = 1.5            # DI range
+        ax.hlines(
+            y=pred,
+            xmin=0.0,
+            xmax=drift_safe,
+            colors="black",
+            linestyles="dashed",
+            linewidth=0.7,
+            zorder=4
+        )
 
-        # diagonal line from origin to predicted point
-        ax.plot([0, drift], [0, pred], linewidth=2, color="black")
-
-        # ---- marker plotted AFTER line to keep on top ----
-        ax.scatter([drift], [pred],
-                   s=40,
-                   facecolors="white",
-                   edgecolors=state_color,
-                   linewidths=1.5,
-                   zorder=5)
-
-        # ---- predicted value label to the RIGHT of circle ----
-        ax.text(drift + 0.5,                 # small horizontal offset
-                pred,                         # same vertical level as circle
-                f"{pred:.2f}",
-                ha="left", va="center",
-                fontsize=8,
-                color=state_color,
-                fontweight="bold",
-                zorder=6)
+        ax.text(
+            drift_safe,
+            pred + 0.06,
+            f"{pred:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color="black",
+            fontweight="bold",
+            zorder=7
+        )
 
 
-        # axis settings
-        ax.set_xlim(0, x_max)
-        ax.set_ylim(0, y_max)
-        ax.set_xlabel("$\\theta$ (%)", fontsize=10)
-        ax.set_ylabel("Damage Index", fontsize=10)
-        ax.set_yticks(np.linspace(0.0, y_max, 6))
+        ax.text(1.04, 0.10 / y_max, "ND",  transform=ax.transAxes,
+                fontsize=8, color="green", fontweight="bold",
+                va="center", ha="left")
+        ax.text(1.04, 0.35 / y_max, "PD",  transform=ax.transAxes,
+                fontsize=8, color="orange", fontweight="bold",
+                va="center", ha="left")
+        ax.text(1.04, 0.75 / y_max, "SD",  transform=ax.transAxes,
+                fontsize=8, color="red", fontweight="bold",
+                va="center", ha="left")
+        ax.text(1.04, 1.25 / y_max, "COL", transform=ax.transAxes,
+                fontsize=8, color="gray", fontweight="bold",
+                va="center", ha="left")
 
-        # remove top and right frame
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(True)
+        ax.spines["right"].set_visible(True)
+        
+        ax.spines ["top"].set_linewidth(0.5)
+        ax.spines ["right"].set_linewidth(0.5)
+        ax.spines ["left"].set_linewidth(0.5)
+        ax.spines ["bottom"].set_linewidth(0.5)
+        
+        ax.tick_params(
+    axis="both",
+    which="major",
+    labelsize=5,
+    length=3,
+    width=0.5,
+    direction="out"
+)
+        
+        ax.grid(True, linestyle="", linewidth=0.5, alpha=0.6)
 
-        # ticks
-        ax.tick_params(labelsize=5)
-
-        # light grid
-        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
-
-        # damage state text inside plot (top-center)
-        ax.text(x_max * 0.5, y_max * 0.92,
-                damage_state,
-                fontsize=14, fontweight="bold",
-                color=state_color,
-                ha="center", va="center")
-
-        plt.tight_layout()
+        plt.tight_layout(pad=0.4)
         st.pyplot(fig)
-
-
-
-
 
 # ======================================================================
 # FOOTER
@@ -370,13 +438,3 @@ st.markdown("""
     Developed by [Bilal Younis]. For academic and research purposes only.
 </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
