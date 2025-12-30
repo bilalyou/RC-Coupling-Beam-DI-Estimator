@@ -80,7 +80,8 @@ st.markdown(r"""
     }
 
     /* ===== MAIN 2-COLUMN ROW ONLY (col1 background) ===== */
-div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(2))
+/* deploy-safe: no :has() */
+div[data-testid="stHorizontalBlock"]:first-of-type
   > div[data-testid="column"]:first-child
   > div {
     background-color: powderblue;
@@ -90,7 +91,8 @@ div[data-testid="stHorizontalBlock"]:has(> div[data-testid="column"]:nth-child(2
 }
 
 /* ===== CANCEL the background for any nested columns (buttons etc.) ===== */
-div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] 
+div[data-testid="stHorizontalBlock"]:first-of-type
+  div[data-testid="stHorizontalBlock"]
   > div[data-testid="column"] > div {
     background-color: transparent !important;
     border: none !important;
